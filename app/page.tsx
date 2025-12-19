@@ -10,9 +10,29 @@ import { TranslationOutput } from "@/components/translation-output"
 
 type TranslationMode = "pm-to-dev" | "dev-to-pm"
 
-const EXAMPLE_PM_INPUT = `We need a smart recommendation feature similar to TikTok's infinite scroll to increase user engagement time. Users should see personalized content based on their interests.`
+// Test cases for PM → Developer
+const PM_TEST_CASES = [
+  {
+    name: "Recommendation Feature",
+    input: `We need a smart recommendation feature similar to TikTok's infinite scroll to increase user engagement time. Users should see personalized content based on their interests.`
+  },
+  {
+    name: "Vague PM Requirement",
+    input: `We need to improve the user experience and make the app faster. Also add some social features.`
+  }
+]
 
-const EXAMPLE_DEV_INPUT = `Optimized database queries with Redis caching layer. Reduced response time from 800ms to 250ms. QPS increased 30%. Also implemented connection pooling to handle more concurrent requests.`
+// Test cases for Developer → PM
+const DEV_TEST_CASES = [
+  {
+    name: "Performance Optimization",
+    input: `Optimized database queries with Redis caching layer. Reduced response time from 800ms to 250ms. QPS increased 30%. Also implemented connection pooling to handle more concurrent requests.`
+  },
+  {
+    name: "Technical Implementation",
+    input: `Implemented GraphQL API with Apollo Server. Added JWT authentication middleware. Used TypeScript for type safety. Set up CI/CD pipeline with GitHub Actions.`
+  }
+]
 
 export default function Home() {
   const [mode, setMode] = useState<TranslationMode>("pm-to-dev")
@@ -73,8 +93,12 @@ export default function Home() {
     }
   }
 
-  const handleLoadExample = () => {
-    setInput(mode === "pm-to-dev" ? EXAMPLE_PM_INPUT : EXAMPLE_DEV_INPUT)
+  const handleLoadExample = (testCaseIndex?: number) => {
+    const testCases = mode === "pm-to-dev" ? PM_TEST_CASES : DEV_TEST_CASES
+    const index = testCaseIndex !== undefined ? testCaseIndex : 0
+    if (testCases[index]) {
+      setInput(testCases[index].input)
+    }
   }
 
   const handleClear = () => {
@@ -178,21 +202,27 @@ export default function Home() {
                 )}
               </h2>
             </div>
-            {/* Quick Example Buttons */}
-            <div className="mb-3 flex flex-wrap gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleLoadExample}
-                disabled={isLoading}
-                className="gap-2 text-xs h-8"
-              >
-                <Zap className="h-3 w-3" />
-                {isPmMode ? "填入PM示例" : "填入开发示例"}
-              </Button>
-              <span className="text-xs text-muted-foreground self-center">
-                或手动输入内容
-              </span>
+            {/* Test Cases Section */}
+            <div className="mb-3 space-y-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-xs text-muted-foreground font-medium">Test Cases:</span>
+                {(isPmMode ? PM_TEST_CASES : DEV_TEST_CASES).map((testCase, index) => (
+                  <Button
+                    key={index}
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleLoadExample(index)}
+                    disabled={isLoading}
+                    className="gap-1 text-xs h-7"
+                  >
+                    <Zap className="h-3 w-3" />
+                    {testCase.name}
+                  </Button>
+                ))}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                or enter manually
+              </p>
             </div>
             <Textarea
               placeholder={
