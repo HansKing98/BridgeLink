@@ -1,13 +1,23 @@
 import { streamText } from "ai"
 import { getPmToDevPrompt, getDevToPmPrompt } from "@/lib/prompt-templates"
+import { TranslationRequestSchema } from "@/lib/schemas"
 
 export async function POST(req: Request) {
   try {
-    const { input, mode } = await req.json()
+    const body = await req.json()
 
-    if (!input?.trim()) {
-      return new Response("Input is required", { status: 400 })
+    // Validate request using Zod schema
+    const validationResult = TranslationRequestSchema.safeParse(body)
+
+    if (!validationResult.success) {
+      const errors = validationResult.error.errors.map((err) => err.message).join(", ")
+      return new Response(
+        JSON.stringify({ error: `Validation failed: ${errors}` }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      )
     }
+
+    const { input, mode } = validationResult.data
 
     const apiKey = process.env.CUSTOM_API_KEY || process.env.OPENAI_API_KEY
     const baseURL = process.env.CUSTOM_API_BASE_URL
@@ -42,8 +52,22 @@ export async function POST(req: Request) {
 
       if (!response.ok) {
         const errorText = await response.text()
-        console.error("[v0] Custom API error:", errorText)
-        throw new Error(`API request failed: ${response.statusText}`)
+        console.error("[BridgeLink] Custom API error:", errorText)
+        
+        // Provide user-friendly error messages
+        let errorMessage = "Translation service unavailable"
+        if (response.status === 401) {
+          errorMessage = "API key is invalid. Please check your configuration."
+        } else if (response.status === 429) {
+          errorMessage = "Rate limit exceeded. Please try again later."
+        } else if (response.status >= 500) {
+          errorMessage = "Translation service is temporarily unavailable. Please try again."
+        }
+        
+        return new Response(
+          JSON.stringify({ error: errorMessage }),
+          { status: response.status, headers: { "Content-Type": "application/json" } }
+        )
       }
 
       // Parse SSE stream and convert to simple text stream
@@ -136,7 +160,23 @@ export async function POST(req: Request) {
 
     return result.toTextStreamResponse()
   } catch (error) {
-    console.error("[v0] Translation API error:", error)
-    return new Response(error instanceof Error ? error.message : "Translation failed", { status: 500 })
+    console.error("[BridgeLink] Translation API error:", error)
+    
+    // Provide user-friendly error messages
+    let errorMessage = "An unexpected error occurred during translation"
+    if (error instanceof Error) {
+      if (error.message.includes("fetch")) {
+        errorMessage = "Network error. Please check your internet connection."
+      } else if (error.message.includes("timeout")) {
+        errorMessage = "Request timed out. Please try again."
+      } else {
+        errorMessage = error.message
+      }
+    }
+    
+    return new Response(
+      JSON.stringify({ error: errorMessage }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    )
   }
 }

@@ -1,0 +1,62 @@
+# Role: Senior Fullstack Engineer & AI Architect
+# Task: Build "BridgeLink" - A Communication Translator for PMs and Devs
+
+## 1. 架构愿景 (Architectural Vision)
+我们需要构建一个高性能、可扩展的翻译工具。架构设计遵循以下原则：
+- **关注点分离 (SoC)**: UI 层 (Next.js Components)、业务逻辑层 (Translation Services)、基础设施层 (AI SDK/API Routes)。
+- **类型安全**: 使用 TypeScript 和 Zod 进行全链路数据校验。
+- **流式体验**: 使用 Vercel AI SDK 实现低延迟的流式输出。
+- **提示词工程**: 核心逻辑在于 Prompt 的设计，需体现“角色补全”和“语义对齐”。
+
+## 2. 技术栈要求
+- **Framework**: Next.js 14+ (App Router)
+- **Styling**: Tailwind CSS + Shadcn/UI (用于快速构建精美界面)
+- **AI Integration**: Vercel AI SDK (支持 OpenAI/Claude 流式返回)
+- **Validation**: Zod
+- **Icons**: Lucide-react
+
+## 3. 核心功能与逻辑深度 (Depth of Thought)
+请按以下步骤执行，每一步完成后进行自检：
+
+### 第一步：工程初始化与类型定义
+- 初始化项目目录。
+- 定义核心类型 `TranslationRole`: 'PRODUCT' | 'DEVELOPER'。
+- 定义 `TranslationRequest` 模式，包含输入文本、源角色、目标角色。
+
+### 第二步：深度提示词工程 (核心重心)
+这是该项目的灵魂。请在 `lib/prompt-templates.ts` 中设计两个高级 System Prompt：
+1. **PM -> Dev 翻译器逻辑**：
+   - 任务：将模糊的需求转化为技术规范。
+   - 必须补全：技术栈建议、数据模型逻辑、API 边界、潜在技术难点、复杂度预估 (Story Points)。
+   - 风格：严谨、结构化、模块化。
+2. **Dev -> PM 翻译器逻辑**：
+   - 任务：将技术实现转化为商业价值。
+   - 必须翻译：用户体验影响 (Speed/Reliability)、业务支撑能力、维护成本、风险提示。
+   - 风格：直观、以结果为导向、非技术术语化。
+
+### 第三步：后端 API (Route Handlers)
+- 实现 `/api/translate` 路由。
+- 接入 Vercel AI SDK 的 `streamText`。
+- 实现错误处理逻辑（如 API 超时、输入过短验证）。
+
+### 第四步：前端 UI 实现
+- **Layout**: 简洁的侧边栏或顶部导航。
+- **Main Interface**: 
+  - 角色切换开关 (Toggle)：产品视角 <-> 开发视角。
+  - 左侧/上方：输入区域 (Textarea)。
+  - 右侧/下方：流式渲染区域 (Markdown 渲染)。
+- **Interaction**: 点击翻译后按钮进入 Loading 状态，支持实时打字机效果。
+
+### 第五步：文档与测试
+- 编写 `README.md`。
+- 包含 2 个典型用例：
+  1. "我们要做一个类似抖音的无限滚动" -> 翻译给开发。
+  2. "我们通过引入 Redis 缓存解决了 OOM 问题并降低了 500ms 延迟" -> 翻译给产品。
+
+## 4. 交付约束
+- 代码必须模块化，不要把所有逻辑写在一个文件。
+- 界面要体现出“工具感”和“专业感”。
+- 必须包含 `env.example` 文件。
+
+---
+现在，请开始执行第一步：初始化项目并安装依赖。

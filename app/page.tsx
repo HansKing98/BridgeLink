@@ -1,20 +1,25 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { ArrowRight, Code2, Users, Sparkles, Loader2 } from "lucide-react"
+import { ArrowRight, Code2, Users, Sparkles, Loader2, Copy, Check, X, Zap } from "lucide-react"
 import { TranslationOutput } from "@/components/translation-output"
 
 type TranslationMode = "pm-to-dev" | "dev-to-pm"
+
+const EXAMPLE_PM_INPUT = `We need a smart recommendation feature similar to TikTok's infinite scroll to increase user engagement time. Users should see personalized content based on their interests.`
+
+const EXAMPLE_DEV_INPUT = `Optimized database queries with Redis caching layer. Reduced response time from 800ms to 250ms. QPS increased 30%. Also implemented connection pooling to handle more concurrent requests.`
 
 export default function Home() {
   const [mode, setMode] = useState<TranslationMode>("pm-to-dev")
   const [input, setInput] = useState("")
   const [output, setOutput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [copied, setCopied] = useState(false)
 
   const handleTranslate = async () => {
     if (!input.trim()) return
@@ -29,7 +34,10 @@ export default function Home() {
         body: JSON.stringify({ input, mode }),
       })
 
-      if (!response.ok) throw new Error("Translation failed")
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: "Translation failed" }))
+        throw new Error(errorData.error || `HTTP ${response.status}: Translation failed`)
+      }
 
       const reader = response.body?.getReader()
       const decoder = new TextDecoder()
@@ -44,12 +52,58 @@ export default function Home() {
         setOutput((prev) => prev + text)
       }
     } catch (error) {
-      console.error("[v0] Translation error:", error)
-      setOutput("❌ Translation failed. Please check your API configuration.")
+      console.error("[BridgeLink] Translation error:", error)
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : "Translation failed. Please check your API configuration."
+      setOutput(`## ❌ Error\n\n${errorMessage}\n\n**Troubleshooting:**\n- Check your API key in environment variables\n- Verify your internet connection\n- Try again in a few moments`)
     } finally {
       setIsLoading(false)
     }
   }
+
+  const handleCopy = async () => {
+    if (!output) return
+    try {
+      await navigator.clipboard.writeText(output)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch (error) {
+      console.error("Failed to copy:", error)
+    }
+  }
+
+  const handleLoadExample = () => {
+    setInput(mode === "pm-to-dev" ? EXAMPLE_PM_INPUT : EXAMPLE_DEV_INPUT)
+  }
+
+  const handleClear = () => {
+    setInput("")
+    setOutput("")
+  }
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Cmd/Ctrl + Enter to translate
+      if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+        e.preventDefault()
+        const currentInput = (document.querySelector('textarea') as HTMLTextAreaElement)?.value || ""
+        if (currentInput.trim() && !isLoading) {
+          handleTranslate()
+        }
+      }
+      // Cmd/Ctrl + K to clear
+      if ((e.metaKey || e.ctrlKey) && e.key === "k" && !e.shiftKey) {
+        e.preventDefault()
+        handleClear()
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoading])
 
   const isPmMode = mode === "pm-to-dev"
 
@@ -124,6 +178,22 @@ export default function Home() {
                 )}
               </h2>
             </div>
+            {/* Quick Example Buttons */}
+            <div className="mb-3 flex flex-wrap gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleLoadExample}
+                disabled={isLoading}
+                className="gap-2 text-xs h-8"
+              >
+                <Zap className="h-3 w-3" />
+                {isPmMode ? "填入PM示例" : "填入开发示例"}
+              </Button>
+              <span className="text-xs text-muted-foreground self-center">
+                或手动输入内容
+              </span>
+            </div>
             <Textarea
               placeholder={
                 isPmMode
@@ -134,21 +204,40 @@ export default function Home() {
               onChange={(e) => setInput(e.target.value)}
               className="min-h-[320px] font-mono text-sm resize-none"
             />
-            <div className="mt-4 flex items-center justify-between">
-              <span className="text-xs text-muted-foreground">{input.length} characters</span>
-              <Button onClick={handleTranslate} disabled={!input.trim() || isLoading} className="gap-2">
-                {isLoading ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Translating...
-                  </>
-                ) : (
-                  <>
-                    Translate
-                    <ArrowRight className="h-4 w-4" />
-                  </>
+            <div className="mt-4 flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                {(input || output) && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleClear}
+                    disabled={isLoading}
+                    className="gap-1 text-xs"
+                  >
+                    <X className="h-3 w-3" />
+                    Clear
+                  </Button>
                 )}
-              </Button>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground">{input.length} chars</span>
+                <Button onClick={handleTranslate} disabled={!input.trim() || isLoading} className="gap-2">
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Translating...
+                    </>
+                  ) : (
+                    <>
+                      Translate
+                      <ArrowRight className="h-4 w-4" />
+                    </>
+                  )}
+                </Button>
+                <span className="text-xs text-muted-foreground hidden sm:inline">
+                  ⌘⏎
+                </span>
+              </div>
             </div>
           </Card>
 
@@ -168,6 +257,26 @@ export default function Home() {
                   </>
                 )}
               </h2>
+              {output && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleCopy}
+                  className="gap-2"
+                >
+                  {copied ? (
+                    <>
+                      <Check className="h-4 w-4" />
+                      Copied!
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="h-4 w-4" />
+                      Copy
+                    </>
+                  )}
+                </Button>
+              )}
             </div>
             <TranslationOutput content={output} isLoading={isLoading} />
           </Card>

@@ -24,12 +24,17 @@ In product development, PMs and developers often struggle to understand each oth
 - Suggests technology stacks and approaches
 - Estimates complexity and effort
 
-### 3. **Real-time Streaming**
+### 3. **Quick Example Loading**
+- One-click example filling for quick testing
+- Examples for both PM and Developer perspectives
+- Helps users understand expected input format
+
+### 4. **Real-time Streaming**
 - See AI translation as it's generated
 - Fast, responsive user experience
 - Built with Vercel AI SDK
 
-### 4. **Custom API Support**
+### 5. **Custom API Support**
 - Works with OpenAI official API
 - Supports custom proxy/relay services (great for China users!)
 - Easy configuration via environment variables
@@ -87,7 +92,7 @@ We need a smart recommendation feature similar to TikTok's infinite scroll
 to increase user engagement time.
 ```
 
-**Output (Developer receives):**
+**Expected Output Structure (Developer receives):**
 ```markdown
 ## 🎯 Technical Implementation Approach
 - Implement personalized recommendation algorithm using collaborative filtering
@@ -169,21 +174,93 @@ Reduced response time from 800ms to 250ms. QPS increased 30%.
 
 ## 🧠 Prompt Engineering Philosophy
 
-The core of BridgeLink is **advanced prompt engineering**:
+The core of BridgeLink is **advanced prompt engineering**. The prompts are carefully crafted to ensure AI thinks like the target audience and proactively fills information gaps.
 
-### PM → Dev Translator Design
-- Forces AI to think like a senior tech lead
-- Identifies technical gaps in requirements
-- Suggests concrete implementation approaches
-- Estimates realistic effort and complexity
+### PM → Dev Translator Design Principles
 
-### Dev → PM Translator Design  
-- Removes technical jargon
-- Focuses on user impact and business metrics
-- Translates performance gains into capacity/cost
-- Makes achievements stakeholder-friendly
+**1. Think Like a Tech Lead**
+- The prompt instructs AI to act as a "senior technical architect" who reviews PRDs
+- Forces critical thinking: "What's missing? What could go wrong?"
+- Encourages asking the hard questions developers would ask
 
-**Key Insight**: Both prompts are designed to **proactively fill gaps** rather than just translating literally.
+**2. Structured Output Requirements**
+The prompt mandates 6 specific sections:
+- **Technical Implementation Approach**: Concrete algorithms, patterns, architecture
+- **Data & Architecture Design**: Data models, flow, APIs, database schema
+- **Performance & Scalability**: Load estimates, latency targets, caching strategies
+- **Technology Stack**: Specific libraries/frameworks with reasoning
+- **Development Estimation**: Complexity, story points, team needs, risks
+- **Critical Questions**: What information is missing that blocks development?
+
+**3. Gap Identification**
+The prompt explicitly lists common gaps to identify:
+- Missing user flow details
+- Unclear success criteria
+- No mention of edge cases
+- Vague performance expectations
+- Missing integration requirements
+- No consideration for future scalability
+
+**4. Developer-Friendly Tone**
+- Uses technical terminology (it's okay to be technical)
+- Direct and actionable
+- Highlights risks and unknowns
+- Doesn't sugarcoat complexity
+
+### Dev → PM Translator Design Principles
+
+**1. Think Like a Product Strategist**
+- The prompt positions AI as a "product strategist" who explains to stakeholders
+- Focuses on business value, not technical details
+- Translates every technical detail into business impact
+
+**2. Business-Focused Output**
+Mandates 6 business-oriented sections:
+- **Business Value & Impact**: User benefits, product experience, measurable outcomes
+- **Growth & Scalability Capacity**: User capacity, new capabilities, market opportunities
+- **Cost & Efficiency Benefits**: Infrastructure savings, time savings, ROI
+- **User Experience Improvements**: Noticeable changes, quality improvements
+- **Trade-offs & Considerations**: Limitations, what we gave up, future work
+- **Celebration-Worthy Achievements**: Technical wins explained in business terms
+
+**3. Jargon Elimination Rules**
+The prompt provides explicit translation rules:
+- ❌ "QPS increased 30%" → ✅ "Can handle 30% more users simultaneously"
+- ❌ "Redis caching" → ✅ "Smart data storage that makes pages load instantly"
+- ❌ "Reduced latency" → ✅ "Pages load faster, users don't wait"
+
+**4. Stakeholder-Friendly Language**
+- Enthusiastic but honest
+- Results-focused
+- Clear and jargon-free
+- Connects to business goals and OKRs
+
+### Key Design Insights
+
+**1. Proactive Gap Filling**
+Both prompts don't just translate—they identify what's missing and suggest what should be included. This is the key differentiator from simple translation.
+
+**2. Role-Based Thinking**
+The prompts force AI to adopt the mindset of the target audience:
+- PM→Dev: Think like a tech lead reviewing a PRD
+- Dev→PM: Think like a PM explaining to executives
+
+**3. Structured Output**
+By mandating specific sections, we ensure consistency and completeness. Users always get the information they need.
+
+**4. Context-Aware Translation**
+The prompts include examples of common scenarios and edge cases, helping AI understand the context better.
+
+### Prompt Evolution
+
+The prompts were iteratively refined to:
+- Reduce generic responses
+- Increase specificity
+- Better identify missing information
+- Improve business value translation
+- Handle edge cases better
+
+**Result**: The prompts now produce outputs that are genuinely useful for cross-functional communication, not just word-for-word translations.
 
 ---
 
@@ -201,14 +278,16 @@ components/
 └── ui/                      # shadcn/ui components
 
 lib/
-└── prompt-templates.ts      # Core prompt engineering logic
+├── prompt-templates.ts      # Core prompt engineering logic
+└── schemas.ts                # Zod validation schemas
 ```
 
 ### Technology Stack
 - **Framework**: Next.js 16 (App Router)
 - **AI Integration**: Vercel AI SDK with streaming
 - **Styling**: Tailwind CSS v4 + shadcn/ui
-- **Type Safety**: TypeScript
+- **Type Safety**: TypeScript + Zod validation
+- **Validation**: Zod for runtime type checking and input validation
 
 ---
 
@@ -243,9 +322,154 @@ Currently supports any OpenAI-compatible API:
 ## 💡 Tips for Best Results
 
 1. **Be specific in input**: More context = better translation
-2. **Use examples**: Reference existing features when possible
+2. **Use examples**: Click "填入PM示例" or "填入开发示例" button above the input box to quickly load example content
 3. **Iterate**: Try different phrasings if first result isn't perfect
 4. **Customize prompts**: Edit `lib/prompt-templates.ts` for your team's needs
+5. **Keyboard shortcuts**: 
+   - `Cmd/Ctrl + Enter`: Translate
+   - `Cmd/Ctrl + K`: Clear all
+
+## 🔒 Data Validation
+
+The project uses **Zod** for runtime type checking and input validation:
+- Validates request format and types
+- Ensures input length limits (max 5000 characters)
+- Validates translation mode
+- Provides clear error messages for invalid inputs
+
+See `lib/schemas.ts` for validation schema definitions.
+
+## 🔧 Environment Variables Setup
+
+Create a `.env.local` file in the project root with your API configuration:
+
+**Option 1: Official OpenAI API**
+```env
+OPENAI_API_KEY=sk-your-openai-api-key-here
+```
+
+**Option 2: Custom Proxy/Relay Service (Recommended for China users)**
+```env
+CUSTOM_API_KEY=your-custom-api-key-here
+CUSTOM_API_BASE_URL=https://your-proxy-server.com/v1
+```
+
+**Notes:**
+- If both `OPENAI_API_KEY` and `CUSTOM_API_KEY` are set, `CUSTOM_API_KEY` takes precedence
+- `CUSTOM_API_BASE_URL` should point to an OpenAI-compatible API endpoint
+- Make sure your API supports streaming responses for best experience
+
+---
+
+## 🧪 Test Cases
+
+### Test Case 1: PM → Developer Translation
+
+**Scenario**: Product Manager wants to add a recommendation feature
+
+**Input**:
+```
+We need a smart recommendation feature similar to TikTok's infinite scroll 
+to increase user engagement time. Users should see personalized content based on their interests.
+```
+
+**Expected Output Should Include**:
+- ✅ Specific recommendation algorithms (collaborative filtering, content-based, etc.)
+- ✅ Data architecture (user interaction data, content features, recommendation service)
+- ✅ Performance requirements (latency targets, concurrent user capacity)
+- ✅ Technology stack suggestions (specific libraries/frameworks)
+- ✅ Development estimation (complexity level, story points, time range)
+- ✅ Questions about missing information (cold start problem, data availability, etc.)
+
+**Evaluation Criteria**:
+- Does it identify technical gaps in the requirement?
+- Are the suggestions concrete and actionable?
+- Does it estimate complexity realistically?
+- Are there questions that would help developers?
+
+---
+
+### Test Case 2: Developer → PM Translation
+
+**Scenario**: Developer completed a performance optimization
+
+**Input**:
+```
+Optimized database queries with Redis caching layer. Reduced response time from 800ms to 250ms. 
+QPS increased 30%. Also implemented connection pooling to handle more concurrent requests.
+```
+
+**Expected Output Should Include**:
+- ✅ User-facing benefits (pages load faster, smoother experience)
+- ✅ Business capacity (can support X% more users)
+- ✅ Cost savings (infrastructure cost reduction)
+- ✅ Growth opportunities (what this enables)
+- ✅ Trade-offs (any limitations or considerations)
+- ✅ Celebration points (technical achievements in business terms)
+
+**Evaluation Criteria**:
+- Is technical jargon translated to business language?
+- Are numbers translated to user/business impact?
+- Does it explain what this means for the product?
+- Are trade-offs and limitations mentioned?
+
+---
+
+### Test Case 3: Vague PM Requirement
+
+**Input**:
+```
+We need to make the app faster.
+```
+
+**Expected Output Should Include**:
+- ✅ Questions about what "faster" means (which pages? target metrics?)
+- ✅ Multiple optimization approaches
+- ✅ Performance measurement strategy
+- ✅ Trade-offs between different approaches
+
+**Evaluation Criteria**:
+- Does it identify that the requirement is too vague?
+- Does it ask clarifying questions?
+- Does it suggest multiple approaches?
+
+---
+
+### Test Case 4: Technical Implementation Details
+
+**Input**:
+```
+Implemented microservices architecture using Docker containers, Kubernetes orchestration, 
+and gRPC for inter-service communication. Added Prometheus monitoring and Grafana dashboards.
+```
+
+**Expected Output Should Include**:
+- ✅ What this means for users (more reliable? faster? scalable?)
+- ✅ Business benefits (can handle growth, reduce downtime, etc.)
+- ✅ Cost implications (infrastructure costs, maintenance)
+- ✅ Future capabilities unlocked
+- ✅ Any risks or trade-offs
+
+**Evaluation Criteria**:
+- Are technical terms explained in business language?
+- Is the business value clear?
+- Does it connect to product goals?
+
+---
+
+## 🎯 How to Evaluate Translation Quality
+
+### For PM → Dev Translations:
+1. **Completeness**: Does it cover all technical aspects needed?
+2. **Specificity**: Are suggestions concrete (not generic)?
+3. **Gap Identification**: Does it identify missing information?
+4. **Actionability**: Can developers start working with this?
+
+### For Dev → PM Translations:
+1. **Jargon-Free**: Can a non-technical person understand it?
+2. **Business Value**: Is the business impact clear?
+3. **User Focus**: Does it explain user benefits?
+4. **Honesty**: Are trade-offs and limitations mentioned?
 
 ---
 
