@@ -1,6 +1,7 @@
 # 🌉 BridgeLink - Communication Translator
 
 A production-ready AI-powered tool that bridges the communication gap between **Product Managers** and **Developers** in enterprise teams.
+<img width="1748" height="1137" alt="截屏2025-12-20 00 08 17" src="https://github.com/user-attachments/assets/0bb0dfa9-9b1f-44d7-bebf-9a3e46abac9a" />
 
 ## 🎯 What Problem Does It Solve?
 
