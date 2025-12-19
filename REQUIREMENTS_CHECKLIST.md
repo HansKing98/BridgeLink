@@ -256,14 +256,14 @@
 
 ### 2. 使用 Zod 进行数据验证
 虽然题目没有强制要求，但 `ai_studio_code.txt` 建议使用 Zod。可以添加：
-```typescript
+\`\`\`typescript
 import { z } from "zod"
 
 const TranslationRequestSchema = z.object({
   input: z.string().min(1).max(5000),
   mode: z.enum(["pm-to-dev", "dev-to-pm"])
 })
-```
+\`\`\`
 
 ### 3. 支持第三个角色（加分项）
 可以添加运营或管理层的翻译模式，扩展应用场景。
@@ -288,4 +288,3 @@ const TranslationRequestSchema = z.object({
 - 完成度: 9-10分
 
 **结论**: 项目完全满足考核要求，所有必须功能都已实现，文档完善，代码质量高。可以高分通过考核。
-

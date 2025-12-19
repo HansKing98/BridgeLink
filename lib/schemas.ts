@@ -17,4 +17,3 @@ export const TranslationRequestSchema = z.object({
 })
 
 export type TranslationRequest = z.infer<typeof TranslationRequestSchema>
-

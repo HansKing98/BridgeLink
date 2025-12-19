@@ -50,32 +50,32 @@ In product development, PMs and developers often struggle to understand each oth
 ### Installation
 
 1. **Clone and install dependencies**
-```bash
+\`\`\`bash
 npm install
-```
+\`\`\`
 
 2. **Configure your API key**
-```bash
+\`\`\`bash
 cp .env.example .env.local
-```
+\`\`\`
 
 Edit `.env.local` and add your API configuration:
 
 **Option A: Official OpenAI API**
-```env
+\`\`\`env
 OPENAI_API_KEY=sk-xxxxxxxxxxxxx
-```
+\`\`\`
 
 **Option B: Custom Proxy (Recommended for China)**
-```env
+\`\`\`env
 CUSTOM_API_KEY=your_proxy_api_key
 CUSTOM_API_BASE_URL=https://your-proxy-server.com/v1
-```
+\`\`\`
 
 3. **Run the development server**
-```bash
+\`\`\`bash
 npm run dev
-```
+\`\`\`
 
 4. **Open your browser**
 Navigate to [http://localhost:3000](http://localhost:3000)
@@ -87,13 +87,13 @@ Navigate to [http://localhost:3000](http://localhost:3000)
 ### Example 1: PM → Developer Translation
 
 **Input (Product Manager perspective):**
-```
+\`\`\`
 We need a smart recommendation feature similar to TikTok's infinite scroll 
 to increase user engagement time.
-```
+\`\`\`
 
 **Expected Output Structure (Developer receives):**
-```markdown
+\`\`\`markdown
 ## 🎯 Technical Implementation Approach
 - Implement personalized recommendation algorithm using collaborative filtering
 - Consider hybrid approach: user-based + content-based filtering
@@ -125,20 +125,20 @@ to increase user engagement time.
 - Do we have enough user data for collaborative filtering?
 - What's the acceptable "cold start" experience?
 - Budget for ML infrastructure?
-```
+\`\`\`
 
 ---
 
 ### Example 2: Developer → PM Translation
 
 **Input (Developer perspective):**
-```
+\`\`\`
 Optimized database queries with Redis caching layer. 
 Reduced response time from 800ms to 250ms. QPS increased 30%.
-```
+\`\`\`
 
 **Output (Product Manager receives):**
-```markdown
+\`\`\`markdown
 ## 💼 Business Value & Impact
 - **Pages load 3x faster** - users see content in under 300ms instead of 800ms
 - **Supports 30% more users** without adding servers
@@ -168,7 +168,7 @@ Reduced response time from 800ms to 250ms. QPS increased 30%.
 - This optimization unlocks our ability to launch in 3 new markets
 - Puts us ahead of competitors in speed benchmarks
 - Engineering innovation that required zero product changes
-```
+\`\`\`
 
 ---
 
@@ -266,7 +266,7 @@ The prompts were iteratively refined to:
 
 ## 🏗️ Architecture
 
-```
+\`\`\`
 app/
 ├── page.tsx                 # Main UI with role switcher
 ├── api/translate/route.ts   # API endpoint with streaming
@@ -280,7 +280,7 @@ components/
 lib/
 ├── prompt-templates.ts      # Core prompt engineering logic
 └── schemas.ts                # Zod validation schemas
-```
+\`\`\`
 
 ### Technology Stack
 - **Framework**: Next.js 16 (App Router)
@@ -344,15 +344,15 @@ See `lib/schemas.ts` for validation schema definitions.
 Create a `.env.local` file in the project root with your API configuration:
 
 **Option 1: Official OpenAI API**
-```env
+\`\`\`env
 OPENAI_API_KEY=sk-your-openai-api-key-here
-```
+\`\`\`
 
 **Option 2: Custom Proxy/Relay Service (Recommended for China users)**
-```env
+\`\`\`env
 CUSTOM_API_KEY=your-custom-api-key-here
 CUSTOM_API_BASE_URL=https://your-proxy-server.com/v1
-```
+\`\`\`
 
 **Notes:**
 - If both `OPENAI_API_KEY` and `CUSTOM_API_KEY` are set, `CUSTOM_API_KEY` takes precedence
@@ -368,10 +368,10 @@ CUSTOM_API_BASE_URL=https://your-proxy-server.com/v1
 **Scenario**: Product Manager wants to add a recommendation feature
 
 **Input**:
-```
+\`\`\`
 We need a smart recommendation feature similar to TikTok's infinite scroll 
 to increase user engagement time. Users should see personalized content based on their interests.
-```
+\`\`\`
 
 **Expected Output Should Include**:
 - ✅ Specific recommendation algorithms (collaborative filtering, content-based, etc.)
@@ -394,10 +394,10 @@ to increase user engagement time. Users should see personalized content based on
 **Scenario**: Developer completed a performance optimization
 
 **Input**:
-```
+\`\`\`
 Optimized database queries with Redis caching layer. Reduced response time from 800ms to 250ms. 
 QPS increased 30%. Also implemented connection pooling to handle more concurrent requests.
-```
+\`\`\`
 
 **Expected Output Should Include**:
 - ✅ User-facing benefits (pages load faster, smoother experience)
@@ -418,9 +418,9 @@ QPS increased 30%. Also implemented connection pooling to handle more concurrent
 ### Test Case 3: Vague PM Requirement
 
 **Input**:
-```
+\`\`\`
 We need to make the app faster.
-```
+\`\`\`
 
 **Expected Output Should Include**:
 - ✅ Questions about what "faster" means (which pages? target metrics?)
@@ -438,10 +438,10 @@ We need to make the app faster.
 ### Test Case 4: Technical Implementation Details
 
 **Input**:
-```
+\`\`\`
 Implemented microservices architecture using Docker containers, Kubernetes orchestration, 
 and gRPC for inter-service communication. Added Prometheus monitoring and Grafana dashboards.
-```
+\`\`\`
 
 **Expected Output Should Include**:
 - ✅ What this means for users (more reliable? faster? scalable?)
